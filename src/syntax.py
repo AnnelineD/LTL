@@ -72,9 +72,9 @@ class LTLFormula:
             case Strong(p, q):
                 return p.get_atoms() | q.get_atoms()
 
-    def replace_var(self, to_replace, replace_with):
+    def replace(self, to_replace, replace_with):
         match self:
-            case Var(s) if Var(s) == to_replace: return replace_with
+            case x if x == to_replace: return replace_with
             case Var(s): return Var(s)
             case Top() | Bottom() as op: return op
             case Not(p): return Not(p.replace_var(to_replace, replace_with))
@@ -176,7 +176,7 @@ class Iff(LTLFormula):  # = And(Then(p, q), Then(q, p))
 
 def test():
     print(Or(Not(Var('a')), Top()).show())
-    print(Or(Not(Var('a')), Top()).replace_var(Var('a'), And(Var('a'), Var('b'))).show())
+    print(Or(Not(Var('a')), Top()).replace(Not(Var('a')), And(Var('a'), Var('b'))).show())
 
 
 if __name__ == '__main__':
