@@ -39,6 +39,41 @@ class LTLFormula:
             case Strong(p, q):
                 return f"({p.show()} SU {q.show()})"
 
+    def get_atoms(self) -> set[Any]:
+        match self:
+            case Top():
+                return set()
+            case Bottom():
+                return set()
+            case Var(s):
+                return {s}
+            case Not(p):
+                return p.get_atoms()
+            case And(p, q):
+                return p.get_atoms() | q.get_atoms()
+            case Or(p, q):
+                return p.get_atoms() | q.get_atoms()
+            case Next(p):
+                return p.get_atoms()
+            case Until(p, q):
+                return p.get_atoms() | q.get_atoms()
+            case Release(p, q):
+                return p.get_atoms() | q.get_atoms()
+            case Then(p, q):
+                return p.get_atoms() | q.get_atoms()
+            case Iff(p, q):
+                return p.get_atoms() | q.get_atoms()
+            case Finally(p):
+                return p.get_atoms()
+            case Globally(p):
+                return p.get_atoms()
+            case Weak(p, q):
+                return p.get_atoms() | q.get_atoms()
+            case Strong(p, q):
+                return p.get_atoms() | q.get_atoms()
+
+    def replace(self):
+        return
 
 @dataclass
 class Top(LTLFormula):
@@ -53,11 +88,6 @@ class Bottom(LTLFormula):
 @dataclass
 class Var(LTLFormula):
     data: Any
-
-
-@dataclass
-class NumericalVar(Var):  # TODO specific variable types should be specified in other files
-    data: 'NumericalFeature'
 
 
 @dataclass
@@ -129,7 +159,7 @@ class Iff(LTLFormula):  # = And(Then(p, q), Then(q, p))
 
 
 def test():
-    print(Or(Finally(NumericalVar('a')), Top()).show())
+    print(Or(Finally(Var('a')), Top()).show())
 
 
 if __name__ == '__main__':
