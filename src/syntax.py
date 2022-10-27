@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 """
 This code is inspired by https://github.com/Adam-Vandervorst/Logics
 """
@@ -44,13 +45,19 @@ class Top(LTLFormula):
     pass
 
 
+@dataclass
 class Bottom(LTLFormula):
     pass
 
 
 @dataclass
 class Var(LTLFormula):
-    name: str  #TODO this can be any type
+    data: Any
+
+
+@dataclass
+class NumericalVar(Var):  # TODO specific variable types should be specified in other files
+    data: 'NumericalFeature'
 
 
 @dataclass
@@ -122,7 +129,7 @@ class Iff(LTLFormula):  # = And(Then(p, q), Then(q, p))
 
 
 def test():
-    print(And(Finally(Var('a')), Top()).show())
+    print(Or(Finally(NumericalVar('a')), Top()).show())
 
 
 if __name__ == '__main__':
