@@ -6,6 +6,7 @@ class SyntaxTest(unittest.TestCase):
     def setUp(self) -> None:
         self.f1 = Or(Finally(Var('a')), Top())
         self.f2 = Then(Var(1), Until(Var("b"), Or(Var("b"), Var(1))))
+        self.f3 = Next(And(Bottom(), Var('a')))
 
     def test_show(self):
         assert self.f1.show() == '(F("a") | True)'
@@ -33,6 +34,7 @@ class SyntaxTest(unittest.TestCase):
         assert Or(Not(Var('a')), Top()) == ~Var('a') | Top()
         assert self.f1 == Finally(Var('a')) | Top()
         assert self.f2 == (Var(1) > Until(Var("b"), Var("b") | Var(1)))
+        assert self.f3 == Next(Bottom() & Var('a'))
 
 
 if __name__ == '__main__':
