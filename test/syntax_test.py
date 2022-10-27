@@ -15,6 +15,13 @@ class SyntaxTest(unittest.TestCase):
         assert self.f1.get_atoms() == {'a'}
         assert self.f2.get_atoms() == {1, 'b'}
 
+    def test_replace(self):
+        assert Var('a').replace(Var('a'), Var(1)) == Var(1)
+        assert Not(Var('a')).replace(Var('a'), Var(1)) == Not(Var(1))
+        assert self.f1.replace(Finally(Var('a')), Var(['a', 'b'])) == Or(Var(['a', 'b']), Top())
+        assert And(Var('a'), Var('a')).replace(Var('a'), Top()) == And(Top(), Top())
+
+
 
 if __name__ == '__main__':
     unittest.main()
