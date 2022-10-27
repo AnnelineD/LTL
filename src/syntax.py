@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 """
 This code is inspired by https://github.com/Adam-Vandervorst/Logics
@@ -41,64 +41,38 @@ class LTLFormula:
 
     def get_atoms(self) -> set[Any]:
         match self:
-            case Top():
-                return set()
-            case Bottom():
-                return set()
             case Var(s):
                 return {s}
-            case Not(p):
+            case Nullary():
+                return set()
+            case Unary(p):
                 return p.get_atoms()
-            case And(p, q):
-                return p.get_atoms() | q.get_atoms()
-            case Or(p, q):
-                return p.get_atoms() | q.get_atoms()
-            case Next(p):
-                return p.get_atoms()
-            case Until(p, q):
-                return p.get_atoms() | q.get_atoms()
-            case Release(p, q):
-                return p.get_atoms() | q.get_atoms()
-            case Then(p, q):
-                return p.get_atoms() | q.get_atoms()
-            case Iff(p, q):
-                return p.get_atoms() | q.get_atoms()
-            case Finally(p):
-                return p.get_atoms()
-            case Globally(p):
-                return p.get_atoms()
-            case Weak(p, q):
-                return p.get_atoms() | q.get_atoms()
-            case Strong(p, q):
+            case Binary(p, q):
                 return p.get_atoms() | q.get_atoms()
 
     def replace(self, to_replace, replace_with):
         match self:
             case x if x == to_replace: return replace_with
             case Var(s): return Var(s)
-            case Top() | Bottom() as op: return op
-            case Not(p): return Not(p.replace(to_replace, replace_with))
-            case And(p, q): return And(p.replace(to_replace, replace_with), q.replace(to_replace, replace_with))
-            case Or(p, q): return Or(p.replace(to_replace, replace_with), q.replace(to_replace, replace_with))
-            case Next(p): return Next(p.replace(to_replace, replace_with))
-            case Until(p, q): return Until(p.replace(to_replace, replace_with), q.replace(to_replace, replace_with))
-            case Release(p, q): return Release(p.replace(to_replace, replace_with), q.replace(to_replace, replace_with))
-            case Then(p, q): return Then(p.replace(to_replace, replace_with), q.replace(to_replace, replace_with))
-            case Iff(p, q): return Iff(p.replace(to_replace, replace_with), q.replace(to_replace, replace_with))
-            case Finally(p): return Finally(p.replace(to_replace, replace_with))
-            case Globally(p): return Globally(p.replace(to_replace, replace_with))
-            case Weak(p, q): return Weak(p.replace(to_replace, replace_with), q.replace(to_replace, replace_with))
-            case Strong(p, q): return Strong(p.replace(to_replace, replace_with), q.replace(to_replace, replace_with))
+            case Nullary() as n: return n
+            case Unary(p) as u: return replace(u, p=p.replace(to_replace, replace_with))
+            case Binary(p, q) as b: return replace(b, l=p.replace(to_replace, replace_with), r=q.replace(to_replace, replace_with))
 
 
 @dataclass
-class Top(LTLFormula):
+class Nullary(LTLFormula):
     pass
 
 
 @dataclass
-class Bottom(LTLFormula):
-    pass
+class Unary(LTLFormula):
+    p: LTLFormula
+
+
+@dataclass
+class Binary(LTLFormula):
+    l: LTLFormula
+    r: LTLFormula
 
 
 @dataclass
@@ -107,69 +81,79 @@ class Var(LTLFormula):
 
 
 @dataclass
-class Not(LTLFormula):
+class Top(Nullary):
+    pass
+
+
+@dataclass
+class Bottom(Nullary):
+    pass
+
+
+@dataclass
+class Not(Unary):
     p: LTLFormula
 
 
 @dataclass
-class And(LTLFormula):
+class And(Binary):
     l: LTLFormula
     r: LTLFormula
 
 
 @dataclass
-class Or(LTLFormula):
+class Or(Binary):
     l: LTLFormula
     r: LTLFormula
 
 
 @dataclass
-class Next(LTLFormula):
+class Next(Unary):
     p: LTLFormula
 
 
 @dataclass
-class Until(LTLFormula):
+class Until(Binary):
     l: LTLFormula
     r: LTLFormula
 
 
 @dataclass
-class Release(LTLFormula):
+class Release(Binary):
     l: LTLFormula
     r: LTLFormula
 
 
 @dataclass
-class Finally(LTLFormula):  # = Until(True, p)
+class Finally(Unary):  # = Until(True, p)
     p: LTLFormula
 
 
 @dataclass
-class Globally(LTLFormula):  # = Not(Finally(Not(p)))
+class Globally(Unary):  # = Not(Finally(Not(p)))
     p: LTLFormula
 
 
 @dataclass
-class Weak(LTLFormula):  # = Release(q, Or(p, q))
+class Weak(Binary):  # = Release(q, Or(p, q))
     l: LTLFormula
     r: LTLFormula
 
 
 @dataclass
-class Strong(LTLFormula):  # = Until(q, And(p, q))
+class Strong(Binary):  # = Until(q, And(p, q))
     l: LTLFormula
     r: LTLFormula
 
 
 @dataclass
-class Then(LTLFormula):  # = Or(Not(p), q)
+class Then(Binary):  # = Or(Not(p), q)
     l: LTLFormula
     r: LTLFormula
 
 
 @dataclass
-class Iff(LTLFormula):  # = And(Then(p, q), Then(q, p))
+class Iff(Binary):  # = And(Then(p, q), Then(q, p))
     l: LTLFormula
     r: LTLFormula
 
