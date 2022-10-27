@@ -72,8 +72,24 @@ class LTLFormula:
             case Strong(p, q):
                 return p.get_atoms() | q.get_atoms()
 
-    def replace(self):
-        return
+    def replace_var(self, to_replace, replace_with):
+        match self:
+            case Var(s) if Var(s) == to_replace: return replace_with
+            case Var(s): return Var(s)
+            case Top() | Bottom() as op: return op
+            case Not(p): return Not(p.replace_var(to_replace, replace_with))
+            case And(p, q): return And(p.replace_var(to_replace, replace_with), q.replace_var(to_replace, replace_with))
+            case Or(p, q): return Or(p.replace_var(to_replace, replace_with), q.replace_var(to_replace, replace_with))
+            case Next(p): return Next(p.replace_var(to_replace, replace_with))
+            case Until(p, q): return Until(p.replace_var(to_replace, replace_with), q.replace_var(to_replace, replace_with))
+            case Release(p, q): return Release(p.replace_var(to_replace, replace_with), q.replace_var(to_replace, replace_with))
+            case Then(p, q): return Then(p.replace_var(to_replace, replace_with), q.replace_var(to_replace, replace_with))
+            case Iff(p, q): return Iff(p.replace_var(to_replace, replace_with), q.replace_var(to_replace, replace_with))
+            case Finally(p): return Finally(p.replace_var(to_replace, replace_with))
+            case Globally(p): return Globally(p.replace_var(to_replace, replace_with))
+            case Weak(p, q): return Weak(p.replace_var(to_replace, replace_with), q.replace_var(to_replace, replace_with))
+            case Strong(p, q): return Strong(p.replace_var(to_replace, replace_with), q.replace_var(to_replace, replace_with))
+
 
 @dataclass
 class Top(LTLFormula):
@@ -159,7 +175,8 @@ class Iff(LTLFormula):  # = And(Then(p, q), Then(q, p))
 
 
 def test():
-    print(Or(Finally(Var('a')), Top()).show())
+    print(Or(Not(Var('a')), Top()).show())
+    print(Or(Not(Var('a')), Top()).replace_var(Var('a'), And(Var('a'), Var('b'))).show())
 
 
 if __name__ == '__main__':
