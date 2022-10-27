@@ -6,6 +6,12 @@ This code is inspired by https://github.com/Adam-Vandervorst/Logics
 
 
 class LTLFormula:
+    def __and__(self, other): return And(self, other)
+    def __or__(self, other): return Or(self, other)
+    def __invert__(self): return Not(self)
+    def __gt__(self, other): return Then(self, other)
+
+
     def show(self) -> str:
         match self:
             case Top():
@@ -160,6 +166,7 @@ class Iff(Binary):  # = And(Then(p, q), Then(q, p))
 
 def test():
     print(Or(Not(Var('a')), Top()).show())
+    print((~Var('a') | Top()).show())
     print(Or(Not(Var('a')), Top()).replace(Not(Var('a')), And(Var('a'), Var('b'))).show())
 
 
