@@ -59,7 +59,7 @@ class LTLFormula:
     def replace(self, to_replace, replace_with):
         match self:
             case x if x == to_replace: return replace_with
-            case Var(s): return Var(s)
+            case Var(s) as v: return v  # return instance instead of constructing a new one, in case it is overridden
             case Nullary() as n: return n
             case Unary(p) as u: return replace(u, p=p.replace(to_replace, replace_with))
             case Binary(p, q) as b: return replace(b, l=p.replace(to_replace, replace_with), r=q.replace(to_replace, replace_with))
