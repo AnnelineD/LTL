@@ -58,7 +58,7 @@ class LTLFormula:
     def get_vars(self) -> set[Any]:
         match self:
             case Var(s) as v:
-                return v
+                return set(v)
             case Nullary():
                 return set()
             case Unary(p):

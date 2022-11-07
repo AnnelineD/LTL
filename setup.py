@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='LTL',
-    version='0.7.4',
+    version='0.7.5',
     packages=['ltl'],
     package_dir={'': 'src'},
     url='',
