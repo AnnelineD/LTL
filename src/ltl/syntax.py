@@ -11,15 +11,14 @@ class LTLFormula:
     def __invert__(self): return Not(self)
     def __gt__(self, other): return Then(self, other)
 
-
     def show(self) -> str:
         match self:
             case Top():
                 return "True"
             case Bottom():
                 return "False"
-            case Var(s):
-                return f"\"{s}\""
+            case Var(s) as v:
+                return f'\"{v.var_show()}\"'
             case Not(p):
                 return f"!{p.show()}"
             case And(p, q):
@@ -84,6 +83,9 @@ class Binary(LTLFormula):
 @dataclass
 class Var(LTLFormula):
     data: Any
+
+    def var_show(self) -> str:
+        return f'{self.data}'
 
 
 @dataclass

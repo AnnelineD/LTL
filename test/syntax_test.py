@@ -9,7 +9,8 @@ class SyntaxTest(unittest.TestCase):
         self.f3 = Next(And(Bottom(), Var('a')))
 
     def test_show(self):
-        assert self.f1.show() == '(F("a") | True)'
+        self.assertEqual('"a"', Var('a').show())
+        self.assertEqual('(F("a") | True)', self.f1.show())
         assert self.f2.show() == '("1" -> ("b" U ("b" | "1")))'
 
     def test_get_atoms(self):
@@ -22,7 +23,7 @@ class SyntaxTest(unittest.TestCase):
             data: int
 
         i1 = Or(IntVar(1), IntVar(2))
-        print(Or(IntVar('a'), IntVar(2)).show())
+        # print(Or(IntVar('a'), IntVar(2)).show())
 
     def test_replace(self):
         assert Var('a').replace(Var('a'), Var(1)) == Var(1)
