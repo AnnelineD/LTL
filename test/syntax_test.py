@@ -17,8 +17,18 @@ class SyntaxTest(unittest.TestCase):
         assert self.f1.get_atoms() == {'a'}
         assert self.f2.get_atoms() == {1, 'b'}
 
+    def test_get_vars(self):
+        self.assertEqual({Var('a')}, self.f1.get_vars())
+        self.assertEqual({Var(1), Var('b')}, self.f2.get_vars())
+
+        @dataclass(frozen=True, eq=True)
+        class IntVar(Var):
+            data: int
+
+        self.assertEqual({IntVar(5)}, IntVar(5).get_vars())
+
     def test_typed_variables(self):
-        @dataclass
+        @dataclass(frozen=True, eq=True)
         class IntVar(Var):
             data: int
 

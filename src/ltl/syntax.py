@@ -58,13 +58,13 @@ class LTLFormula:
     def get_vars(self) -> set[Any]:
         match self:
             case Var(s) as v:
-                return set(v)
+                return {v}
             case Nullary():
                 return set()
             case Unary(p):
-                return p.get_atoms()
+                return p.get_vars()
             case Binary(p, q):
-                return p.get_atoms() | q.get_atoms()
+                return p.get_vars() | q.get_vars()
 
     def replace(self, to_replace, replace_with):
         match self:
@@ -91,7 +91,7 @@ class Binary(LTLFormula):
     r: LTLFormula
 
 
-@dataclass
+@dataclass(frozen=True, eq=True)
 class Var(LTLFormula):
     data: Any
 
