@@ -55,6 +55,17 @@ class LTLFormula:
             case Binary(p, q):
                 return p.get_atoms() | q.get_atoms()
 
+    def get_vars(self) -> set[Any]:
+        match self:
+            case Var(s) as v:
+                return v
+            case Nullary():
+                return set()
+            case Unary(p):
+                return p.get_atoms()
+            case Binary(p, q):
+                return p.get_atoms() | q.get_atoms()
+
     def replace(self, to_replace, replace_with):
         match self:
             case x if x == to_replace: return replace_with
