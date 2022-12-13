@@ -1,5 +1,5 @@
 from dataclasses import dataclass, replace
-from typing import Any
+from typing import Any, Tuple
 """
 This code is inspired by https://github.com/Adam-Vandervorst/Logics
 """
@@ -35,14 +35,20 @@ class LTLFormula:
                 return f"({p.show()} -> {q.show()})"
             case Iff(p, q):
                 return f"({p.show()} <-> {q.show()})"
-            case Finally(p):
-                return f"F({p.show()})"
+            case Finally(p, b):
+                if not b: return f"F({p.show()})"
+                else: return f"F[{b}]({p.show()})"
             case Globally(p):
                 return f"G({p.show()})"
             case Weak(p, q):
                 return f"({p.show()} WU {q.show()})"
             case Strong(p, q):
                 return f"({p.show()} SU {q.show()})"
+            case Previous(p):
+                return f"Y({p.show()})"
+            case Once(p, b):
+                if not b: return f"O({p.show()})"
+                else: return f"O[{b}]({p.show()})"
 
     def get_atoms(self) -> set[Any]:
         match self:
@@ -146,6 +152,7 @@ class Release(Binary):
 @dataclass
 class Finally(Unary):  # = Until(True, p)
     p: LTLFormula
+    bound: Tuple[int, int] = None
 
 
 @dataclass
@@ -177,10 +184,22 @@ class Iff(Binary):  # = And(Then(p, q), Then(q, p))
     r: LTLFormula
 
 
+@dataclass
+class Previous(Unary):
+    p: LTLFormula
+
+
+@dataclass
+class Once(Unary):
+    p: LTLFormula
+    bound: Tuple[int, int] = None
+
+
 def test():
     print(Or(Not(Var('a')), Top()).show())
     print((~Var('a') | Top()).show())
     print(Or(Not(Var('a')), Top()).replace(Not(Var('a')), And(Var('a'), Var('b'))).show())
+    print(Finally(Var('a'), (5, 5)).show())
 
 
 if __name__ == '__main__':
