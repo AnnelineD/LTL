@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     name='LTL',
-    version='0.8.0',
-    packages=['ltl'],
+    version='1.1.0',
+    packages=['ltl', 'ctl'],
     package_dir={'': 'src'},
     url='',
     license='',
